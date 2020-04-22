@@ -1,33 +1,43 @@
 plugins {
-    id 'org.springframework.boot' version '2.0.3.RELEASE'
+    id 'org.springframework.boot' version '2.2.6.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'java'
 }
-
-apply plugin: 'io.spring.dependency-management'
 
 group = 'cn.geobeans'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 repositories {
-    mavenLocal()
-    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-    mavenCentral()
+    maven { url 'http://10.0.1.29/repository/maven-public' }
+}
+
+ext {
+    set('springCloudVersion', "Hoxton.SR3")
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation group: 'com.dangdang', name: 'sharding-jdbc-core', version: '1.5.4'
+    implementation 'org.springframework.boot:spring-boot-starter-web-services'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
 
-    // https://mvnrepository.com/artifact/com.alibaba/druid
-    compile group: 'com.alibaba', name: 'druid', version: '1.1.16'
-    // json 工具
-    implementation group: 'com.alibaba', name: 'fastjson', version: '1.2.47'
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
 
-    // 自动生成 getter setter 等
-    implementation 'org.projectlombok:lombok:1.18.4'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+test {
+    useJUnitPlatform()
 }
